@@ -28,7 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private IUserRepo userRepo;
 
-    @Value("secret.key")
+    @Value("${secret.key}")
     private String secretKey;
 
     @Override
@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if(authenticationHeader != null && authenticationHeader.startsWith("Bearer ")) {
             try {
-                String token = authenticationHeader.substring("Bearer".length());
+                String token = authenticationHeader.substring("Bearer ".length());
                 Algorithm algorithm =Algorithm.HMAC256(secretKey.getBytes());
                 JWTVerifier verifier = JWT.require(algorithm).build();
                 DecodedJWT decodedJWT = verifier.verify(token);
