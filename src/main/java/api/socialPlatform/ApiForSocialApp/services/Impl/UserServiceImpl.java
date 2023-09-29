@@ -34,16 +34,15 @@ public class UserServiceImpl implements IUserService {
         Optional<User> userOptional = userRepo.findByUserId(userId);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            UserDto userDto = UserDto.builder()
-                    .userId(user.getUserId())
-                    .username(user.getUsername())
-                    .currentName(user.getCurrentName())
-                    .email(user.getEmail())
-                    .imageUrl(user.getImageUrl())
-                    .build();
+            UserDto userDto = UserDto.fromUser(user);
 
             return Optional.of(userDto);
         } else return Optional.empty();
+    }
+
+    @Override
+    public Optional<User> findUserById(UUID userId) {
+        return userRepo.findByUserId(userId);
     }
 
     @Override
@@ -57,5 +56,10 @@ public class UserServiceImpl implements IUserService {
                         .imageUrl(user.getImageUrl())
                         .build()
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public User getUserByToken(String token) {
+        return null;
     }
 }

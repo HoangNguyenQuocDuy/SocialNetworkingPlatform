@@ -11,5 +11,7 @@ public interface IUserService {
 
     User saveUser(User user);
     Optional<UserDto> getUserById(UUID userId);
+    Optional<User> findUserById(UUID userId);
     List<UserDto> getAllUser();
+    User getUserByToken(String token);
 }

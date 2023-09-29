@@ -37,6 +37,11 @@ public class User implements UserDetails {
         this.imageUrl = imageUrl;
     }
 
+    public Set<Post> setPosts(Post post) {
+        posts.add(post);
+        return posts;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

@@ -29,7 +29,7 @@ public class AuthService {
             var jwtAccessToken = jwtService.generateToken(user);
             var jwtRefreshToken = jwtService.generateRefreshToken(user);
 
-            response.setHeader("Bearer ", jwtAccessToken);
+            response.setHeader("Authentication", "Bearer " + jwtAccessToken);
 
             return ResponseEntity.ok(
                     AuthResponse.builder()
