@@ -20,14 +20,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable());
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeHttpRequests(authorize -> {
+        http.csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(authorize -> {
             authorize
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/api/v1/auth/**").permitAll()
                     .requestMatchers("/api/v1/users/**").permitAll()
                     .requestMatchers("/api/v1/posts/**").permitAll()
+                    .requestMatchers("/api/v1/comments/**").permitAll()
 
                     .anyRequest().authenticated();
         })

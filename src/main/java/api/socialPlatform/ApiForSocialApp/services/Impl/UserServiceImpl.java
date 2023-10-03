@@ -1,11 +1,16 @@
 package api.socialPlatform.ApiForSocialApp.services.Impl;
 
-import api.socialPlatform.ApiForSocialApp.dto.UserDto;
+import api.socialPlatform.ApiForSocialApp.dto.UserResponseDto;
 import api.socialPlatform.ApiForSocialApp.model.User;
 import api.socialPlatform.ApiForSocialApp.repositories.IUserRepo;
 import api.socialPlatform.ApiForSocialApp.services.IUserService;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +25,9 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private IUserRepo userRepo;
 
+    @Value("${secret.key}")
+    private String secretKey;
+
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -30,11 +38,11 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public Optional<UserDto> getUserById(UUID userId) {
+    public Optional<UserResponseDto> getUserById(UUID userId) {
         Optional<User> userOptional = userRepo.findByUserId(userId);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            UserDto userDto = UserDto.fromUser(user);
+            UserResponseDto userDto = UserResponseDto.fromUser(user);
 
             return Optional.of(userDto);
         } else return Optional.empty();
@@ -46,9 +54,9 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public List<UserDto> getAllUser() {
+    public List<UserResponseDto> getAllUser() {
         return userRepo.findAll().stream().map(
-                user -> UserDto.builder()
+                user -> UserResponseDto.builder()
                         .userId(user.getUserId())
                         .username(user.getUsername())
                         .email(user.getEmail())
@@ -60,6 +68,15 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User getUserByToken(String token) {
-        return null;
+        try {
+            Algorithm algorithm =Algorithm.HMAC256(secretKey.getBytes());
+            JWTVerifier verifier = JWT.require(algorithm).build();
+            DecodedJWT decodedJWT = verifier.verify(token);
+            String username = decodedJWT.getSubject();
+
+            return userRepo.findByUsername(username).orElse(null);
+        } catch(Exception e) {
+            return null;
+        }
     }
 }

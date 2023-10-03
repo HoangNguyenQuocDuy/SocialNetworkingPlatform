@@ -2,12 +2,14 @@ package api.socialPlatform.ApiForSocialApp.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -15,6 +17,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,13 +31,18 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private Set<Post> posts;
     @OneToMany(mappedBy = "user")
-    private Set<Comments> comments;
+    private Set<Comment> comments;
 
     public User(String username, String currentName, String password, String imageUrl) {
         this.username = username;
         this.currentName = currentName;
         this.password = password;
         this.imageUrl = imageUrl;
+    }
+
+    @PrePersist
+    private void onCreate() {
+        this.posts = new HashSet<Post>();
     }
 
     public Set<Post> setPosts(Post post) {

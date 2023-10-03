@@ -1,6 +1,6 @@
 package api.socialPlatform.ApiForSocialApp.controllers;
 
-import api.socialPlatform.ApiForSocialApp.dto.UserDto;
+import api.socialPlatform.ApiForSocialApp.dto.UserResponseDto;
 import api.socialPlatform.ApiForSocialApp.model.ResponseObject;
 import api.socialPlatform.ApiForSocialApp.services.Impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class UserController {
 
     @GetMapping("/")
     public ResponseEntity<ResponseObject> getUsers() {
-        List<UserDto> users = userService.getAllUser();
+        List<UserResponseDto> users = userService.getAllUser();
         if (users.size() > 0) {
             return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Find all users successfully!", users)
@@ -40,7 +40,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseObject> getUser(@PathVariable UUID id){
-        Optional<UserDto> user = userService.getUserById(id);
+        Optional<UserResponseDto> user = userService.getUserById(id);
         if (user.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Get user by ID successfully!", user)
