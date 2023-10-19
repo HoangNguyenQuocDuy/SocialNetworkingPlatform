@@ -32,6 +32,8 @@ public class User implements UserDetails {
     private Set<Post> posts;
     @OneToMany(mappedBy = "user")
     private Set<Comment> comments;
+    @OneToOne(mappedBy = "user")
+    private RefreshToken refreshToken;
 
     public User(String username, String currentName, String password, String imageUrl) {
         this.username = username;

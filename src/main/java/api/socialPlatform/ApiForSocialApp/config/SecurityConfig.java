@@ -26,6 +26,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
+//                .cors(cors -> cors.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> {
             authorize
@@ -34,6 +36,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/v1/users/**").permitAll()
                     .requestMatchers("/api/v1/posts/**").permitAll()
                     .requestMatchers("/api/v1/comments/**").permitAll()
+                    .requestMatchers("/api/v1/refreshToken/**").permitAll()
 
                     .anyRequest().authenticated();
         })

@@ -1,5 +1,8 @@
 package api.socialPlatform.ApiForSocialApp.controllers;
+
 import api.socialPlatform.ApiForSocialApp.dto.AuthRequest;
+import api.socialPlatform.ApiForSocialApp.dto.AuthResponse;
+import api.socialPlatform.ApiForSocialApp.dto.RefreshTokenRequestDto;
 import api.socialPlatform.ApiForSocialApp.dto.UserRequestDto;
 import api.socialPlatform.ApiForSocialApp.model.ResponseObject;
 import api.socialPlatform.ApiForSocialApp.services.AuthService;
@@ -8,14 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("api/v1/auth")
-@CrossOrigin()
 public class AuthController {
     private final AuthService authService;
 
@@ -38,9 +37,34 @@ public class AuthController {
             );
         }
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest, HttpServletResponse response) {
 
         return ResponseEntity.ok(authService.authenticate(authRequest, response));
+    }
+
+    @PostMapping("/refreshToken")
+    public ResponseEntity<ResponseObject> refreshAccessToken(@RequestBody RefreshTokenRequestDto refreshToken) {
+
+        try {
+            AuthResponse authResponse = authService.refreshAccessToken(refreshToken.getRefreshToken());
+
+            if (authResponse != null) {
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject("OK", "Refresh access token successfully!", authResponse)
+                );
+            }
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(
+                    new ResponseObject("FAILED", "Failed when refresh access token!", null)
+            );
+
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(
+                    new ResponseObject("FAILED", "Something went wrong!",
+                            e.getMessage())
+            );
+        }
     }
 }

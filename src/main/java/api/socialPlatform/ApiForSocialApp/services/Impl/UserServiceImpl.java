@@ -1,6 +1,7 @@
 package api.socialPlatform.ApiForSocialApp.services.Impl;
 
 import api.socialPlatform.ApiForSocialApp.dto.UserResponseDto;
+import api.socialPlatform.ApiForSocialApp.model.RefreshToken;
 import api.socialPlatform.ApiForSocialApp.model.User;
 import api.socialPlatform.ApiForSocialApp.repositories.IUserRepo;
 import api.socialPlatform.ApiForSocialApp.services.IUserService;
@@ -49,6 +50,17 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public Optional<UserResponseDto> getUserByUserName(String username) {
+        Optional<User> userOptional = userRepo.findByUsername(username);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            UserResponseDto userDto = UserResponseDto.fromUser(user);
+
+            return Optional.of(userDto);
+        } else return Optional.empty();
+    }
+
+    @Override
     public Optional<User> findUserById(UUID userId) {
         return userRepo.findByUserId(userId);
     }
@@ -78,5 +90,10 @@ public class UserServiceImpl implements IUserService {
         } catch(Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public Optional<User> findUserByRefreshToken(RefreshToken refreshToken) {
+        return userRepo.findByRefreshToken(refreshToken);
     }
 }

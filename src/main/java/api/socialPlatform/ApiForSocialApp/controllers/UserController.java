@@ -36,7 +36,7 @@ public class UserController {
         );
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<ResponseObject> getUser(@PathVariable UUID id){
         Optional<UserResponseDto> user = userService.getUserById(id);
         if (user.isPresent()) {
@@ -49,5 +49,16 @@ public class UserController {
         );
     }
 
-
+    @GetMapping("/username/{username}")
+    public ResponseEntity<ResponseObject> getUser(@PathVariable String username){
+        Optional<UserResponseDto> user = userService.getUserByUserName(username);
+        if (user.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Get user by username successfully!", user)
+            );
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ResponseObject("FAILED", "User not found", "")
+        );
+    }
 }

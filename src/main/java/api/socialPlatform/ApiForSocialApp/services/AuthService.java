@@ -4,8 +4,10 @@ import api.socialPlatform.ApiForSocialApp.dto.AuthRequest;
 import api.socialPlatform.ApiForSocialApp.dto.AuthResponse;
 import api.socialPlatform.ApiForSocialApp.dto.UserRequestDto;
 import api.socialPlatform.ApiForSocialApp.dto.UserResponseDto;
+import api.socialPlatform.ApiForSocialApp.model.RefreshToken;
 import api.socialPlatform.ApiForSocialApp.model.User;
 import api.socialPlatform.ApiForSocialApp.repositories.IUserRepo;
+import api.socialPlatform.ApiForSocialApp.services.Impl.RefreshTokenServiceImp;
 import api.socialPlatform.ApiForSocialApp.services.Impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -26,21 +29,22 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
     private final UserServiceImpl userService;
+    private final RefreshTokenServiceImp refreshTokenServiceImp;
 
     public ResponseEntity<?> authenticate(AuthRequest request, HttpServletResponse response) {
         try {
             User user = userRepo.findByUsername(request.getUsername()).orElseThrow(()-> new Exception("User not found!"));
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             var jwtAccessToken = jwtService.generateToken(user);
-            var jwtRefreshToken = jwtService.generateRefreshToken(user);
 
             response.setHeader("Authentication", "Bearer " + jwtAccessToken);
-            response.setHeader("Refresh-Token", jwtRefreshToken);
+
+            RefreshToken jwtRefreshToken = refreshTokenServiceImp.createRefreshToken(user);
 
             return ResponseEntity.ok(
                     AuthResponse.builder()
                             .accessToken(jwtAccessToken)
-                            .refreshToken(jwtRefreshToken)
+                            .refreshToken(jwtRefreshToken.getToken())
                             .username(user.getUsername())
                             .build()
             );
@@ -70,5 +74,25 @@ public class AuthService {
                     userService.saveUser(user);
                     return UserResponseDto.fromUser(user);
             }
-        }
     }
+
+    public AuthResponse refreshAccessToken(String oldRefreshToken) throws Exception {
+        RefreshToken refreshToken = refreshTokenServiceImp.getRefreshTokenByToken(oldRefreshToken);
+
+        if (refreshToken!= null && refreshToken.getExpiredAt().after(new Date())) {
+            User user = userRepo.findByRefreshToken(refreshToken).orElseThrow(()-> new Exception("User not found!"));
+            RefreshToken newRefreshToken = refreshTokenServiceImp.createRefreshToken(user);
+            String newAccessToken = jwtService.generateToken(user);
+
+            return AuthResponse
+                    .builder()
+                    .username(user.getUsername())
+                    .accessToken(newAccessToken)
+                    .refreshToken(newRefreshToken.getToken())
+                    .build();
+        } else if (refreshToken == null) {
+            throw new Exception("Refresh token is not valid!");
+        } else throw new Exception("Refresh token is expired!");
+    }
+
+}
