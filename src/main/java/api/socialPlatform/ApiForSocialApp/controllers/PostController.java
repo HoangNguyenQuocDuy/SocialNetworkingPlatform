@@ -12,8 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -54,7 +54,7 @@ public class PostController {
                 );
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        new ResponseObject("FAILED", "User doesn't has any post", null)
+                        new ResponseObject("FAILED", "User doesn't has any post", new ArrayList<>())
                 );
             }
         } catch (Exception e) {

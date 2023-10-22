@@ -1,6 +1,8 @@
 package api.socialPlatform.ApiForSocialApp.config;
 
+import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,7 +16,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -22,6 +26,13 @@ import java.util.List;
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final AuthenticationProvider authenticationProvider;
+
+    @Value("${cloudinary.cloud-name}")
+    private String cloudName;
+    @Value("${cloudinary.api-key}")
+    private String apiKey;
+    @Value("${cloudinary.api-secret}")
+    private String apiSecret;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,6 +48,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/v1/posts/**").permitAll()
                     .requestMatchers("/api/v1/comments/**").permitAll()
                     .requestMatchers("/api/v1/refreshToken/**").permitAll()
+                    .requestMatchers("/api/v1/cloudinary/**").permitAll()
 
                     .anyRequest().authenticated();
         })
@@ -59,5 +71,16 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
+    }
+
+    @Bean
+    public Cloudinary getCloudinary() {
+        Map config = new HashMap();
+        config.put("cloud_name", cloudName);
+        config.put("api_key", apiKey);
+        config.put("api_secret", apiSecret);
+        config.put("secure", true);
+
+        return new Cloudinary(config);
     }
 }

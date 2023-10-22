@@ -17,4 +17,9 @@ public interface IUserService {
     List<UserResponseDto> getAllUser();
     User getUserByToken(String token);
     Optional<User> findUserByRefreshToken(RefreshToken refreshToken);
+    List<UserResponseDto> getListFriends(UUID userId) throws Exception;
+
+    List<UserResponseDto> addFriendToUser(UUID userId, UUID friendId);
+//
+//    List<UserResponseDto> deleteFriend(UUID userId);
 }

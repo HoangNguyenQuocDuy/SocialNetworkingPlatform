@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Data
@@ -27,6 +24,10 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String imageUrl;
+    @ElementCollection
+    private Set<UUID> friendIds;
+    @ElementCollection
+    private Set<UUID> invitorIds;
 
     @OneToMany(mappedBy = "user")
     private Set<Post> posts;
@@ -42,6 +43,11 @@ public class User implements UserDetails {
         this.imageUrl = imageUrl;
     }
 
+    public List<UUID> addFriend(UUID userId) {
+        this.setFriendIds(userId);
+        return (List<UUID>) friendIds;
+    }
+
     @PrePersist
     private void onCreate() {
         this.posts = new HashSet<Post>();
@@ -50,6 +56,11 @@ public class User implements UserDetails {
     public Set<Post> setPosts(Post post) {
         posts.add(post);
         return posts;
+    }
+
+    public Set<UUID> setFriendIds(UUID userId) {
+        friendIds.add(userId);
+        return friendIds;
     }
 
     @Override

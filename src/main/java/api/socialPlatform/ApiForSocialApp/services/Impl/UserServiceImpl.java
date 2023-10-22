@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -96,4 +97,54 @@ public class UserServiceImpl implements IUserService {
     public Optional<User> findUserByRefreshToken(RefreshToken refreshToken) {
         return userRepo.findByRefreshToken(refreshToken);
     }
+
+    @Override
+    public List<UserResponseDto> getListFriends(UUID userId) throws Exception {
+        Optional<User> userOptional = userRepo.findByUserId(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            try {
+                List<UserResponseDto> friends = caseToListUserResponseDto(user);
+
+                return friends;
+            } catch(Exception exception) {
+                throw new Exception(exception.getMessage());
+            }
+
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<UserResponseDto> addFriendToUser(UUID userId, UUID friendId) {
+        Optional<User> userOptional = userRepo.findByUserId(userId);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            user.setFriendIds(friendId);
+
+           return caseToListUserResponseDto(user);
+        }
+        return null;
+    }
+
+    private List<UserResponseDto> caseToListUserResponseDto(User user) {
+        List<UserResponseDto> friends = new ArrayList<>();
+
+        user.getFriendIds().forEach(id -> {
+            User userFriend = userRepo.findByUserId(id).get();
+            UserResponseDto userResponseDto = UserResponseDto.fromUser(userFriend);
+            friends.add(userResponseDto);
+        });
+
+        return friends;
+    }
+
+//    @Override
+//    public List<UserResponseDto> deleteFriend(UUID userId) {
+//        return null;
+//    }
 }

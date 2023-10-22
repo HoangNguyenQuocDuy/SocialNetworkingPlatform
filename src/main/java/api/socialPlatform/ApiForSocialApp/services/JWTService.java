@@ -16,13 +16,7 @@ public class JWTService {
     public String generateToken(User user) {
         return JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10*1000))
-                .sign(Algorithm.HMAC256(secretKey.getBytes()));
-    }
-    public String generateRefreshToken(User user) {
-        return JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 70*60*1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 50*60*1000))
                 .sign(Algorithm.HMAC256(secretKey.getBytes()));
     }
 }

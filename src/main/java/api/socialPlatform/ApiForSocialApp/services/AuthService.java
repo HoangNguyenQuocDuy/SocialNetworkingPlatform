@@ -64,16 +64,16 @@ public class AuthService {
         } else if (userRepo.findByEmail(userRequestDto.getEmail()).isPresent()) {
             throw new Exception("Email has been used!");
         } else {
-                    User user = User.builder()
-                            .username(userRequestDto.getUsername())
-                            .password(userRequestDto.getPassword())
-                            .currentName(userRequestDto.getCurrentName())
-                            .email(userRequestDto.getEmail())
-                            .imageUrl(userRequestDto.getImageUrl())
-                            .build();
-                    userService.saveUser(user);
-                    return UserResponseDto.fromUser(user);
-            }
+            User user = User.builder()
+                    .username(userRequestDto.getUsername())
+                    .password(userRequestDto.getPassword())
+                    .currentName(userRequestDto.getCurrentName())
+                    .email(userRequestDto.getEmail())
+                    .imageUrl(userRequestDto.getImageUrl())
+                    .build();
+            userService.saveUser(user);
+            return UserResponseDto.fromUser(user);
+        }
     }
 
     public AuthResponse refreshAccessToken(String oldRefreshToken) throws Exception {
