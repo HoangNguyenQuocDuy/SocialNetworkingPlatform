@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +27,27 @@ public class RefreshToken {
     @JoinColumn(name = "userId", nullable = false)
     @JsonBackReference
     private User user;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public Date getExpiredAt() {
+        return expiredAt;
+    }
+
+    public Date getCreateAt() {
+        return createAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
     @PrePersist
     private void onCreate() {
         this.createAt = new Date();

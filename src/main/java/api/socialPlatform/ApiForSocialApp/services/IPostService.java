@@ -4,16 +4,17 @@ import api.socialPlatform.ApiForSocialApp.dto.PostRequestDto;
 import api.socialPlatform.ApiForSocialApp.dto.PostResponseDto;
 import api.socialPlatform.ApiForSocialApp.model.Post;
 import api.socialPlatform.ApiForSocialApp.model.User;
+import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface IPostService {
     Post createPost(PostRequestDto post, User user);
     PostResponseDto getPostById(UUID postId);
-    List<PostResponseDto> getAllPosts(UUID userId);
+    List<PostResponseDto> getAllPostsByUserId(UUID userId);
+    List<PostResponseDto> getAllPost(Pageable pageable);
     void deletePost(UUID postId, UUID userId) throws Exception;
     Post updatePost(UUID postId, PostRequestDto post, UUID userId) throws Exception;
+    PostResponseDto likesPost(User user, UUID postId);
 }

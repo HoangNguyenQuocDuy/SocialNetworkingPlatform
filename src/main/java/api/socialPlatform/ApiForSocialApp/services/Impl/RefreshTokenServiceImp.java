@@ -23,7 +23,7 @@ public class RefreshTokenServiceImp implements IRefreshTokenService {
     @Override
     public RefreshToken createRefreshToken(User user) {
         RefreshToken oldRefreshToken = user.getRefreshToken();
-        if (oldRefreshToken != null && oldRefreshToken.getExpiredAt().after(new Date()))
+        if (oldRefreshToken != null)
             refreshTokenRepo.deleteByToken(oldRefreshToken.getToken());
 
         RefreshToken refreshToken = RefreshToken

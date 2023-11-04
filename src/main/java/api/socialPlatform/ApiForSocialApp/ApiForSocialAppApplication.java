@@ -17,12 +17,12 @@ public class ApiForSocialAppApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ApiForSocialAppApplication.class, args);
 	}
-	@Bean
-	CommandLineRunner run(UserServiceImpl userService) {
-		return args -> {
-			userService.saveUser(new User("user01", "q_duy", "123456", "asdbc"));
-			userService.saveUser(new User("user02", "q_duy_2", "5151", "asdbcfasg"));
-			userService.saveUser(new User("user03", "q_duy_3", "123456", "gsdg"));
-		};
-	}
+//	@Bean
+//	CommandLineRunner run(UserServiceImpl userService) {
+//		return args -> {
+//			userService.saveUser(new User("user01", "q_duy", "123456", "asdbc"));
+//			userService.saveUser(new User("user02", "q_duy_2", "5151", "asdbcfasg"));
+//			userService.saveUser(new User("user03", "q_duy_3", "123456", "gsdg"));
+//		};
+//	}
 }

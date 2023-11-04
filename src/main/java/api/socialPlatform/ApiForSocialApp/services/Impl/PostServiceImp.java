@@ -5,15 +5,14 @@ import api.socialPlatform.ApiForSocialApp.dto.PostResponseDto;
 import api.socialPlatform.ApiForSocialApp.model.Post;
 import api.socialPlatform.ApiForSocialApp.model.User;
 import api.socialPlatform.ApiForSocialApp.repositories.IPostRepo;
+import api.socialPlatform.ApiForSocialApp.repositories.IUserRepo;
 import api.socialPlatform.ApiForSocialApp.services.IPostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +21,8 @@ public class PostServiceImp implements IPostService {
     private IPostRepo postRepo;
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private IUserRepo userRepo;
 
     @Override
     public Post createPost(PostRequestDto postDto, User user) {
@@ -45,7 +46,7 @@ public class PostServiceImp implements IPostService {
     }
 
     @Override
-    public List<PostResponseDto> getAllPosts(UUID userId) {
+    public List<PostResponseDto> getAllPostsByUserId(UUID userId) {
         Optional<User> userOptional = userService.findUserById(userId);
 
         if (userOptional.isPresent()) {
@@ -53,6 +54,11 @@ public class PostServiceImp implements IPostService {
             return postsFind.stream().map(PostResponseDto::fromPost).collect(Collectors.toList());
         }
         return null;
+    }
+
+    @Override
+    public List<PostResponseDto> getAllPost(Pageable pageable) {
+        return postRepo.findAll(pageable).stream().map(PostResponseDto::fromPost).collect(Collectors.toList());
     }
 
     @Override
@@ -82,5 +88,36 @@ public class PostServiceImp implements IPostService {
             throw new Exception("User id not authorization!");
         else
             throw new Exception("Post not found!");
+    }
+
+    @Override
+    public PostResponseDto likesPost(User user, UUID postId) {
+        Optional<Post> postOptional = postRepo.findById(postId);
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+            PostResponseDto postResponse = PostResponseDto.fromPost(post);
+
+            Set<User> likeByUsers = post.getLikeByUsers();
+            Set<Post> likePosts = user.getLikedPosts();
+
+            if (post.getLikeByUsers().contains(user)) {
+                likeByUsers.remove(user);
+                likePosts.remove(post);
+            } else {
+                likeByUsers.add(user);
+                likePosts.add(post);
+            }
+            post.setLikes(likeByUsers.size());
+            post.setLikeByUsers(likeByUsers);
+
+            user.setLikedPosts(likePosts);
+            userRepo.save(user);
+            postRepo.save(post);
+
+            postResponse.setLikes(post.getLikeByUsers().stream().toList().size());
+
+            return postResponse;
+        }
+        return null;
     }
 }

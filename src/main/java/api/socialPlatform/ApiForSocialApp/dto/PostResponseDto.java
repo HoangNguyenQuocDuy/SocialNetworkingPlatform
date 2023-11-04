@@ -13,7 +13,7 @@ import java.util.UUID;
 public class PostResponseDto {
     private List<String> postImageUrls;
     private String postDescription;
-    private int likes;
+    private long likes;
     private Date createdAt;
     private Date updatedAt;
     private UUID userId;
