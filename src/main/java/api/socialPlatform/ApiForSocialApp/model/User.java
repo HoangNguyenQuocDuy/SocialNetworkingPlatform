@@ -36,6 +36,8 @@ public class User implements UserDetails {
     private Set<Comment> comments;
     @OneToOne(mappedBy = "user")
     private RefreshToken refreshToken;
+    @OneToMany(mappedBy = "user")
+    private Set<Message> messages;
     @ManyToMany
     @JoinTable(
             name = "user_liked_posts",
@@ -43,6 +45,13 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "postId"))
     @JsonManagedReference
     private Set<Post> likedPosts;
+//    @ManyToMany
+//    @JoinTable(
+//            name = "user_in_rooms",
+//            joinColumns = @JoinColumn(name = "userId"),
+//            inverseJoinColumns = @JoinColumn(name = "roomId"))
+//    @JsonManagedReference
+//    private Set<Room> rooms;
 
     public User(String username, String currentName, String password, String imageUrl) {
         this.username = username;
@@ -173,6 +182,14 @@ public class User implements UserDetails {
     public void setLikedPosts(Set<Post> likedPosts) {
         this.likedPosts = likedPosts;
     }
+
+    public Set<Message> getMessages() {
+        return messages;
+    }
+
+//    public Set<Room> getUserInRooms() {
+//        return rooms;
+//    }
 
     @Override
     public boolean isAccountNonExpired() {

@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -32,21 +34,28 @@ public class JwtFilter extends OncePerRequestFilter {
     @Value("${secret.key}")
     private String secretKey;
 
+    @Autowired
+    private UserDetailsService userDetailsService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         String authenticationHeader = request.getHeader(AUTHORIZATION);
 
-        if(authenticationHeader != null && authenticationHeader.startsWith("Bearer ")) {
+        if (authenticationHeader != null && authenticationHeader.startsWith("Bearer ")) {
             try {
                 String token = authenticationHeader.substring("Bearer ".length());
-                Algorithm algorithm =Algorithm.HMAC256(secretKey.getBytes());
+                Algorithm algorithm = Algorithm.HMAC256(secretKey.getBytes());
                 JWTVerifier verifier = JWT.require(algorithm).build();
                 DecodedJWT decodedJWT = verifier.verify(token);
                 String username = decodedJWT.getSubject();
-                userRepo.findByUsername(username).orElseThrow(()->new Exception("User not found!"));
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, null);
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 filterChain.doFilter(request, response);
             } catch (Exception e) {
                 ErrorResponse errorResponse = new ErrorResponse(FORBIDDEN, e.getMessage());
@@ -54,6 +63,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 response.setStatus(errorResponse.getStatusCodeValue());
                 new ObjectMapper().writeValue(response.getOutputStream(), errorResponse);
             }
-        }else filterChain.doFilter(request, response);
+        } else {
+            filterChain.doFilter(request, response);
+        }
     }
 }

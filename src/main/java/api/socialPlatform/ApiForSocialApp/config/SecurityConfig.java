@@ -43,13 +43,14 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> {
             authorize
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .requestMatchers("/api/v1/auth/**").permitAll()
-                    .requestMatchers("/api/v1/users/**").permitAll()
-                    .requestMatchers("/api/v1/posts/**").permitAll()
-                    .requestMatchers("/api/v1/comments/**").permitAll()
-                    .requestMatchers("/api/v1/refreshToken/**").permitAll()
-                    .requestMatchers("/api/v1/cloudinary/**").permitAll()
-
+                    .requestMatchers("/api/v1/auth/**", "/api/v1/users/**", "/api/v1/posts/**",
+                            "/api/v1/comments/**", "/api/v1/refreshToken/**", "/ws/**").permitAll()
+                    .requestMatchers("/api/v1/posts/save", "/api/v1/posts/delete/{postId}",
+                            "/api/v1/posts/update/{postId}",
+                            "/api/v1/posts/update/{postId}/like", "/api/v1/cloudinary/**",
+                            "/api/v1/comments/save/**", "/api/v1/comments/{postId}/delete/{commentId}",
+                            "/api/v1/comments/{postId}/update/{commentId}",
+                            "/api/v1/rooms/save").authenticated()
                     .anyRequest().authenticated();
         })
                 .authenticationProvider(authenticationProvider)
@@ -63,7 +64,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 

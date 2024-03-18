@@ -1,6 +1,7 @@
 package api.socialPlatform.ApiForSocialApp.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,7 @@ public class Post {
     private Set<Comment> comments;
 
     @ManyToMany(mappedBy = "likedPosts")
+    @JsonIgnore
     private Set<User> likeByUsers;
 
     @PrePersist

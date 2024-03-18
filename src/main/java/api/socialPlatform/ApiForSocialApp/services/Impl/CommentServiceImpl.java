@@ -9,6 +9,9 @@ import api.socialPlatform.ApiForSocialApp.repositories.ICommentRepo;
 import api.socialPlatform.ApiForSocialApp.repositories.IPostRepo;
 import api.socialPlatform.ApiForSocialApp.services.ICommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -45,12 +48,6 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
-    public List<CommentResponseDto> getAllComment(UUID postId) {
-        List<Comment> comments = commentRepo.findByPostPostId(postId);
-        return comments.stream().map(CommentResponseDto::fromComment).collect(Collectors.toList());
-    }
-
-    @Override
     public void deleteComment(UUID postId, UUID commentId, UUID userId) throws Exception {
         Optional<Comment> commentOptional = commentRepo.findById(commentId);
         if (commentOptional.isPresent()) {
@@ -81,5 +78,10 @@ public class CommentServiceImpl implements ICommentService {
             } else throw new Exception("You are not authorization!");
         }
         throw new Exception("Comment not found!");
+    }
+
+    @Override
+    public List<CommentResponseDto> getAllComments(UUID postId, Pageable pageable) {
+        return commentRepo.findByPostPostId(postId, pageable).stream().map(CommentResponseDto::fromComment).collect(Collectors.toList());
     }
 }
