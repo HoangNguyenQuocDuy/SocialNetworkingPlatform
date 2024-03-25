@@ -24,13 +24,11 @@ public class ChatRoom {
     @Id
     private UUID id;
     private Set<UserResponseDto> users;
+    private String lastMessage;
+    private String roomName;
+    private Date updatedAt;
     private Date createdAt;
 
-    @CreatedDate
-    private Date updatedAt;
-
-    @LastModifiedDate
-    private String lastMessage;
 
     public void addUsers(Set<UserResponseDto> setUsers) {
         if (users == null) {

@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface ICommentService {
     CommentResponseDto createComment(CommentRequestDto commentDto, UUID postId, User user) throws Exception;
     List<CommentResponseDto> getAllComments(UUID postId, Pageable pageable);
-    void deleteComment(UUID postId, UUID commentId, UUID userId) throws Exception;
+    void deleteComment(UUID postId, UUID commentId, User user) throws Exception;
     CommentResponseDto updateComment(UUID postId, UUID commentId, UUID userId, CommentRequestDto commentRequestDto) throws Exception;
 
 }

@@ -1,5 +1,6 @@
 package api.socialPlatform.ApiForSocialApp.services.Impl;
 
+import api.socialPlatform.ApiForSocialApp.dto.ChatRoomRequestDto;
 import api.socialPlatform.ApiForSocialApp.dto.UserResponseDto;
 import api.socialPlatform.ApiForSocialApp.model.ChatRoom;
 import api.socialPlatform.ApiForSocialApp.model.User;
@@ -19,10 +20,10 @@ public class ChatRoomServiceImpl implements IChatRoomService {
     @Autowired
     private UserServiceImpl userService;
     @Override
-    public ChatRoom createRoom(Set<UUID> userIds) throws Exception {
+    public ChatRoom createRoom(ChatRoomRequestDto chatRoomBody) throws Exception {
             Set<UserResponseDto> users = new HashSet<>();
 
-            userIds.forEach(userId -> {
+            chatRoomBody.getUsersIds().forEach(userId -> {
                 Optional<UserResponseDto> user = userService.getUserById(userId);
                 if (user.isPresent()) {
                     users.add(user.get());
@@ -34,12 +35,21 @@ public class ChatRoomServiceImpl implements IChatRoomService {
                     }
                 }
             });
-            ChatRoom room = new ChatRoom();
-            room.setId(UUID.randomUUID());
-            room.addUsers(users);
+            ChatRoom newChatRoom = ChatRoom.builder()
+                    .id(UUID.randomUUID())
+                    .users(users)
+                    .roomName(chatRoomBody.getRoomName())
+                    .build();
 
-            return roomRepo.save(room);
+            return roomRepo.save(newChatRoom);
 
+    }
+
+    @Override
+    public ChatRoom getRoomById(UUID roomId) throws Exception {
+        Optional<ChatRoom> chatRoom = roomRepo.findById(roomId);
+        if (chatRoom.isPresent()) return chatRoom.get();
+        else throw new Exception("Room with id " + roomId + " not found!");
     }
 
     @Override
@@ -64,5 +74,10 @@ public class ChatRoomServiceImpl implements IChatRoomService {
     @Override
     public ChatRoom addUserToRoom(UUID roomId, UUID userId) {
         return null;
+    }
+
+    @Override
+    public ChatRoom updateRoom(ChatRoom chatRoom) {
+        return roomRepo.save(chatRoom);
     }
 }

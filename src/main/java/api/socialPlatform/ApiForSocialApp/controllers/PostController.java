@@ -6,6 +6,8 @@ import api.socialPlatform.ApiForSocialApp.model.Post;
 import api.socialPlatform.ApiForSocialApp.model.ResponseObject;
 import api.socialPlatform.ApiForSocialApp.model.User;
 import api.socialPlatform.ApiForSocialApp.repositories.IPostRepo;
+import api.socialPlatform.ApiForSocialApp.services.IPostService;
+import api.socialPlatform.ApiForSocialApp.services.IUserService;
 import api.socialPlatform.ApiForSocialApp.services.Impl.PostServiceImp;
 import api.socialPlatform.ApiForSocialApp.services.Impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +24,9 @@ import java.util.UUID;
 @RequestMapping("/api/v1/posts")
 public class PostController {
     @Autowired
-    private PostServiceImp postServiceImp;
+    private IPostService postServiceImp;
     @Autowired
-    private UserServiceImpl userServiceImp;
+    private IUserService userServiceImp;
 
     @GetMapping("/")
     public ResponseEntity<ResponseObject> getAllPosts(@RequestParam(defaultValue = "2")
@@ -122,11 +124,8 @@ public class PostController {
                         new ResponseObject("FAILED", "Failed when trying delete post!", e.getMessage())
                 );
             }
-//        }
-//        return ResponseEntity.status(HttpStatus.valueOf(404)).body(
-//                new ResponseObject("FAILED", "Failed when trying delete post!", "User not found!")
-//        );
     }
+
     @PutMapping("/update/{postId}")
     public ResponseEntity<ResponseObject> updatePost(@PathVariable UUID postId,
                                                      @RequestBody PostRequestDto post,
@@ -156,7 +155,7 @@ public class PostController {
 //        if (user != null) {
             try {
                 User user = userServiceImp.getUserByToken(token.substring(7));
-                PostResponseDto postResponseDto = postServiceImp.likesPost(user, postId);
+                PostResponseDto postResponseDto = postServiceImp.likedPost(user, postId);
 
                 return ResponseEntity.status(HttpStatus.valueOf(200)).body(
                         new ResponseObject("OK", "Likes post successfully!", postResponseDto)

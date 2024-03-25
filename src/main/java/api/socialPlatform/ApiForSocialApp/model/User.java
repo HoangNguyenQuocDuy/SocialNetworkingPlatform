@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.engine.internal.Cascade;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -36,33 +37,18 @@ public class User implements UserDetails {
     private Set<Comment> comments;
     @OneToOne(mappedBy = "user")
     private RefreshToken refreshToken;
-    @OneToMany(mappedBy = "user")
-    private Set<Message> messages;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "user_liked_posts",
             joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "postId"))
     @JsonManagedReference
     private Set<Post> likedPosts;
-//    @ManyToMany
-//    @JoinTable(
-//            name = "user_in_rooms",
-//            joinColumns = @JoinColumn(name = "userId"),
-//            inverseJoinColumns = @JoinColumn(name = "roomId"))
-//    @JsonManagedReference
-//    private Set<Room> rooms;
-
     public User(String username, String currentName, String password, String imageUrl) {
         this.username = username;
         this.currentName = currentName;
         this.password = password;
         this.imageUrl = imageUrl;
-    }
-
-    public List<UUID> addFriend(UUID userId) {
-        this.setFriendIds(userId);
-        return (List<UUID>) friendIds;
     }
 
     @PrePersist
@@ -73,11 +59,6 @@ public class User implements UserDetails {
     public Set<Post> setPosts(Post post) {
         posts.add(post);
         return posts;
-    }
-
-    public Set<UUID> setFriendIds(UUID userId) {
-        friendIds.add(userId);
-        return friendIds;
     }
 
     @Override
@@ -182,14 +163,6 @@ public class User implements UserDetails {
     public void setLikedPosts(Set<Post> likedPosts) {
         this.likedPosts = likedPosts;
     }
-
-    public Set<Message> getMessages() {
-        return messages;
-    }
-
-//    public Set<Room> getUserInRooms() {
-//        return rooms;
-//    }
 
     @Override
     public boolean isAccountNonExpired() {

@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.*;
 
@@ -30,11 +32,14 @@ public class Post {
     @JsonBackReference
     private User user;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private Set<Comment> comments;
 
-    @ManyToMany(mappedBy = "likedPosts")
     @JsonIgnore
+    @ManyToMany(mappedBy = "likedPosts", cascade = { CascadeType.PERSIST, CascadeType.MERGE },
+            fetch = FetchType.LAZY)
+    // delete likeByUsers when delete post
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<User> likeByUsers;
 
     @PrePersist
@@ -123,5 +128,9 @@ public class Post {
 
     public void setLikeByUsers(Set<User> likeByUsers) {
         this.likeByUsers = likeByUsers;
+    }
+
+    public void dislike(User user) {
+        likeByUsers.remove(user);
     }
 }

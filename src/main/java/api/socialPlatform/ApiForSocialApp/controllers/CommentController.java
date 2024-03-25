@@ -4,6 +4,9 @@ import api.socialPlatform.ApiForSocialApp.dto.CommentRequestDto;
 import api.socialPlatform.ApiForSocialApp.dto.PostResponseDto;
 import api.socialPlatform.ApiForSocialApp.model.ResponseObject;
 import api.socialPlatform.ApiForSocialApp.model.User;
+import api.socialPlatform.ApiForSocialApp.services.ICommentService;
+import api.socialPlatform.ApiForSocialApp.services.IPostService;
+import api.socialPlatform.ApiForSocialApp.services.IUserService;
 import api.socialPlatform.ApiForSocialApp.services.Impl.CommentServiceImpl;
 import api.socialPlatform.ApiForSocialApp.services.Impl.PostServiceImp;
 import api.socialPlatform.ApiForSocialApp.services.Impl.UserServiceImpl;
@@ -20,11 +23,11 @@ import java.util.UUID;
 @RequestMapping("/api/v1/comments")
 public class CommentController {
     @Autowired
-    private PostServiceImp postService;
+    private IPostService postService;
     @Autowired
-    private CommentServiceImpl commentService;
+    private ICommentService commentService;
     @Autowired
-    private UserServiceImpl userService;
+    private IUserService userService;
 
     @PostMapping("/save/{postId}")
     public ResponseEntity<ResponseObject> submitComment(@PathVariable UUID postId,
@@ -78,7 +81,7 @@ public class CommentController {
 //        if (user != null) {
             try {
                 User user = userService.getUserByToken(token.substring(7));
-                commentService.deleteComment(postId, commentId, user.getUserId());
+                commentService.deleteComment(postId, commentId, user);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject("OK", "Delete comment successfully!",
                                 "")

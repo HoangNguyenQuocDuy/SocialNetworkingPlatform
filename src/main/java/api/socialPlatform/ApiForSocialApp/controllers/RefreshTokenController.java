@@ -3,6 +3,7 @@ package api.socialPlatform.ApiForSocialApp.controllers;
 import api.socialPlatform.ApiForSocialApp.dto.UserResponseDto;
 import api.socialPlatform.ApiForSocialApp.model.RefreshToken;
 import api.socialPlatform.ApiForSocialApp.model.ResponseObject;
+import api.socialPlatform.ApiForSocialApp.services.IRefreshTokenService;
 import api.socialPlatform.ApiForSocialApp.services.Impl.RefreshTokenServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/refreshToken")
 public class RefreshTokenController {
     @Autowired
-    private RefreshTokenServiceImp refreshTokenService;
+    private IRefreshTokenService refreshTokenService;
 
     @GetMapping("/")
     ResponseEntity<ResponseObject> getRefreshToken(@RequestBody UserResponseDto user) {

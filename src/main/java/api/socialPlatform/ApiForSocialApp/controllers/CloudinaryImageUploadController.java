@@ -1,6 +1,7 @@
 package api.socialPlatform.ApiForSocialApp.controllers;
 
 import api.socialPlatform.ApiForSocialApp.model.ResponseObject;
+import api.socialPlatform.ApiForSocialApp.services.ICloudinaryService;
 import api.socialPlatform.ApiForSocialApp.services.Impl.CloudinaryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -18,7 +19,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/cloudinary")
 public class CloudinaryImageUploadController {
     @Autowired
-    private CloudinaryServiceImpl cloudinaryService;
+    private ICloudinaryService cloudinaryService;
 
     @PostMapping("/upload")
     public ResponseEntity<ResponseObject> uploadImage(@RequestParam("image")MultipartFile file) {

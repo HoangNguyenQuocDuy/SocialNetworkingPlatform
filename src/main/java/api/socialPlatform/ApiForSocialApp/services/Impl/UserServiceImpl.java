@@ -99,36 +99,15 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public List<UserResponseDto> getListFriends(UUID userId) throws Exception {
-        Optional<User> userOptional = userRepo.findByUserId(userId);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
+    public List<UserResponseDto> findUsersByCurrentName(String currentName) {
+        List<User> users = userRepo.findAllByCurrentNameContaining(currentName);
+        List<UserResponseDto> usersResponse = new ArrayList<>();
 
-            try {
-                List<UserResponseDto> friends = caseToListUserResponseDto(user);
-
-                return friends;
-            } catch(Exception exception) {
-                throw new Exception(exception.getMessage());
-            }
-
+        for (User user: users) {
+            usersResponse.add(UserResponseDto.fromUser(user));
         }
 
-        return null;
-    }
-
-    @Override
-    public List<UserResponseDto> addFriendToUser(UUID userId, UUID friendId) {
-        Optional<User> userOptional = userRepo.findByUserId(userId);
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            user.setFriendIds(friendId);
-
-           return caseToListUserResponseDto(user);
-        }
-        return null;
+        return usersResponse;
     }
 
     private List<UserResponseDto> caseToListUserResponseDto(User user) {
@@ -142,9 +121,4 @@ public class UserServiceImpl implements IUserService {
 
         return friends;
     }
-
-//    @Override
-//    public List<UserResponseDto> deleteFriend(UUID userId) {
-//        return null;
-//    }
 }

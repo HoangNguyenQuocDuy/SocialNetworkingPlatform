@@ -44,14 +44,19 @@ public class SecurityConfig {
             authorize
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/api/v1/auth/**", "/api/v1/users/**", "/api/v1/posts/**",
-                            "/api/v1/comments/**", "/api/v1/refreshToken/**", "/ws/**").permitAll()
-                    .requestMatchers("/api/v1/posts/save", "/api/v1/posts/delete/{postId}",
+                            "/api/v1/comments/{postId}/**", "/api/v1/refreshToken/**", "/ws/**").permitAll()
+                    .requestMatchers(
+                            "/api/v1/posts/save",
+                            "/api/v1/posts/delete/{postId}",
                             "/api/v1/posts/update/{postId}",
-                            "/api/v1/posts/update/{postId}/like", "/api/v1/cloudinary/**",
-                            "/api/v1/comments/save/**", "/api/v1/comments/{postId}/delete/{commentId}",
+                            "/api/v1/posts/update/{postId}/like",
+                            "/api/v1/cloudinary/**",
+                            "/api/v1/comments/save/**",
+                            "/api/v1/comments/{postId}/delete/{commentId}",
                             "/api/v1/comments/{postId}/update/{commentId}",
-                            "/api/v1/rooms/save").authenticated()
+                            "/api/v1/rooms/**").authenticated()
                     .anyRequest().authenticated();
+            ;
         })
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

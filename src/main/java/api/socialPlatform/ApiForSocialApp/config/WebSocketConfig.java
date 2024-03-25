@@ -29,7 +29,6 @@ package api.socialPlatform.ApiForSocialApp.config;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
     private static final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
 
     @Autowired
@@ -37,9 +36,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic");
+        registry.enableSimpleBroker("/rooms");
         registry.setApplicationDestinationPrefixes("/app");
-
     }
 
     @Override

@@ -16,5 +16,7 @@ public interface IPostService {
     List<PostResponseDto> getAllPost(Pageable pageable);
     void deletePost(UUID postId, UUID userId) throws Exception;
     Post updatePost(UUID postId, PostRequestDto post, UUID userId) throws Exception;
-    PostResponseDto likesPost(User user, UUID postId);
+    PostResponseDto likedPost(User user, UUID postId);
+    PostResponseDto dislikedPost(User user, UUID postId);
+    void deleteLikePostByPostId(UUID postId);
 }

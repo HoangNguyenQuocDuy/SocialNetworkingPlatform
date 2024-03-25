@@ -7,9 +7,9 @@ import api.socialPlatform.ApiForSocialApp.model.User;
 import api.socialPlatform.ApiForSocialApp.repositories.IPostRepo;
 import api.socialPlatform.ApiForSocialApp.repositories.IUserRepo;
 import api.socialPlatform.ApiForSocialApp.services.IPostService;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,7 +23,8 @@ public class PostServiceImp implements IPostService {
     private UserServiceImpl userService;
     @Autowired
     private IUserRepo userRepo;
-
+//    @Autowired
+//    private IUserLikedPostsRepository userLikedPostsRepository;
     @Override
     public Post createPost(PostRequestDto postDto, User user) {
         Post post = Post.builder()
@@ -61,16 +62,24 @@ public class PostServiceImp implements IPostService {
         return postRepo.findAll(pageable).stream().map(PostResponseDto::fromPost).collect(Collectors.toList());
     }
 
+//    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = { Exception.class })
     @Override
     public void deletePost(UUID postId,UUID userId) throws Exception {
-        Optional<Post> postDelete = postRepo.findById(postId);
-        if (postDelete.isPresent() && postDelete.get().getUser().getUserId() == userId) {
-            postRepo.deleteById(postId);
-        }
-        else if (postDelete.get().getUser().getUserId() != userId)
-            throw new Exception("User id not authorization!");
-        else
+        Optional<Post> postOptional = postRepo.findById(postId);
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+            User postUser = post.getUser();
+
+            if (!postUser.getUserId().equals(userId)) {
+                throw new Exception("User is not authorized to delete this post!");
+            }
+
+            post.getLikeByUsers().forEach(user -> user.getLikedPosts().remove(post));
+
+            postRepo.delete(post);
+        } else {
             throw new Exception("Post not found!");
+        }
     }
 
     @Override
@@ -91,7 +100,7 @@ public class PostServiceImp implements IPostService {
     }
 
     @Override
-    public PostResponseDto likesPost(User user, UUID postId) {
+    public PostResponseDto likedPost(User user, UUID postId) {
         Optional<Post> postOptional = postRepo.findById(postId);
         if (postOptional.isPresent()) {
             Post post = postOptional.get();
@@ -119,5 +128,26 @@ public class PostServiceImp implements IPostService {
             return postResponse;
         }
         return null;
+    }
+
+    @Override
+    public PostResponseDto dislikedPost(User user, UUID postId) {
+        Optional<Post> postOptional = postRepo.findById(postId);
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+
+            post.dislike(user);
+            PostResponseDto postResponse = PostResponseDto.fromPost(post);
+            postRepo.save(post);
+            postResponse.setLikes(post.getLikeByUsers().stream().toList().size());
+
+            return postResponse;
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteLikePostByPostId(UUID postId) {
+
     }
 }

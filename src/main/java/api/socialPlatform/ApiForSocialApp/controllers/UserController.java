@@ -2,6 +2,7 @@ package api.socialPlatform.ApiForSocialApp.controllers;
 
 import api.socialPlatform.ApiForSocialApp.dto.UserResponseDto;
 import api.socialPlatform.ApiForSocialApp.model.ResponseObject;
+import api.socialPlatform.ApiForSocialApp.services.IUserService;
 import api.socialPlatform.ApiForSocialApp.services.Impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,24 +17,33 @@ import java.util.UUID;
 @RequestMapping("/api/v1/users")
 
 public class UserController {
-    private final UserServiceImpl userService;
-
     @Autowired
-    public UserController(UserServiceImpl userService) {
-        this.userService = userService;
-    }
+    private IUserService userService;
 
     @GetMapping("/")
-    public ResponseEntity<ResponseObject> getUsers() {
+    public ResponseEntity<ResponseObject> getUsers(@RequestParam String currentName) {
         List<UserResponseDto> users = userService.getAllUser();
-        if (users.size() > 0) {
-            return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Find all users successfully!", users)
+        try {
+            if (currentName != null) {
+                List<UserResponseDto> usersFilter = userService.findUsersByCurrentName(currentName);
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject("OK", "Filter users by currentName successfully!", usersFilter)
+                );
+            } else {
+                if (users.size() > 0) {
+                    return ResponseEntity.status(HttpStatus.OK).body(
+                            new ResponseObject("OK", "Find all users successfully!", users)
+                    );
+                }
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        new ResponseObject("FAILED", "List users is empty.", "")
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(
+                    new ResponseObject("FAILED", "Something went wrong", e.getMessage())
             );
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                new ResponseObject("FAILED", "List users is empty.", "")
-        );
     }
 
     @GetMapping("/id/{id}")
@@ -50,7 +60,7 @@ public class UserController {
     }
 
     @GetMapping("/username/{username}")
-    public ResponseEntity<ResponseObject> getUser(@PathVariable String username){
+    public ResponseEntity<ResponseObject> getUser(@PathVariable String username) {
         Optional<UserResponseDto> user = userService.getUserByUserName(username);
         if (user.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK).body(

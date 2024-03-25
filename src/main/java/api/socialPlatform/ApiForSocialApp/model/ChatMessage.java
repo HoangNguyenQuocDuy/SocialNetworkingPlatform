@@ -19,12 +19,8 @@ public class ChatMessage {
     @Id
     private UUID id;
     private String content;
-    private UUID chatRoomId;
     private UUID userId;
-
-    @CreatedDate
+    private UUID chatRoomId;
     private Date createdAt;
-
-    @LastModifiedDate
     private Date updatedAt;
 }

@@ -48,11 +48,11 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
-    public void deleteComment(UUID postId, UUID commentId, UUID userId) throws Exception {
+    public void deleteComment(UUID postId, UUID commentId, User user) throws Exception {
         Optional<Comment> commentOptional = commentRepo.findById(commentId);
         if (commentOptional.isPresent()) {
             Comment comment = commentOptional.get();
-            if (comment.getPost().getPostId().equals(postId) && comment.getUser().getUserId().equals(userId)) {
+            if (comment.getPost().getPostId().equals(postId) && comment.getUser().getUserId().equals(user.getUserId())) {
                 commentRepo.deleteById(commentId);
                 return;
             } else if (!comment.getPost().getPostId().equals(postId)) {
