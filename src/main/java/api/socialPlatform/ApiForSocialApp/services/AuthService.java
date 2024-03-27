@@ -11,6 +11,7 @@ import api.socialPlatform.ApiForSocialApp.services.Impl.RefreshTokenServiceImp;
 import api.socialPlatform.ApiForSocialApp.services.Impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,11 +26,16 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final IUserRepo userRepo;
-    private final AuthenticationManager authenticationManager;
-    private final JWTService jwtService;
-    private final UserServiceImpl userService;
-    private final RefreshTokenServiceImp refreshTokenServiceImp;
+    @Autowired
+    private IUserRepo userRepo;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JWTService jwtService;
+    @Autowired
+    private UserServiceImpl userService;
+    @Autowired
+    private RefreshTokenServiceImp refreshTokenServiceImp;
 
     public ResponseEntity<?> authenticate(AuthRequest request, HttpServletResponse response) {
         try {

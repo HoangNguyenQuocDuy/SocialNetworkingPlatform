@@ -2,6 +2,7 @@ package api.socialPlatform.ApiForSocialApp.config;
 
 import api.socialPlatform.ApiForSocialApp.repositories.IUserRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
-    private final IUserRepo userRepo;
+    @Autowired
+    private IUserRepo userRepo;
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> (UserDetails) userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found!"));

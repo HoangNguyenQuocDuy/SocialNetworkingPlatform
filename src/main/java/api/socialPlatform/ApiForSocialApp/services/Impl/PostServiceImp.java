@@ -7,7 +7,6 @@ import api.socialPlatform.ApiForSocialApp.model.User;
 import api.socialPlatform.ApiForSocialApp.repositories.IPostRepo;
 import api.socialPlatform.ApiForSocialApp.repositories.IUserRepo;
 import api.socialPlatform.ApiForSocialApp.services.IPostService;
-import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -52,6 +51,7 @@ public class PostServiceImp implements IPostService {
 
         if (userOptional.isPresent()) {
             List<Post> postsFind = postRepo.findByUserUserId(userId);
+            Collections.sort(postsFind);
             return postsFind.stream().map(PostResponseDto::fromPost).collect(Collectors.toList());
         }
         return null;

@@ -2,6 +2,7 @@ package api.socialPlatform.ApiForSocialApp.config;
 
 import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,8 +25,10 @@ import java.util.Map;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final JwtFilter jwtFilter;
-    private final AuthenticationProvider authenticationProvider;
+    @Autowired
+    private JwtFilter jwtFilter;
+    @Autowired
+    private AuthenticationProvider authenticationProvider;
 
     @Value("${cloudinary.cloud-name}")
     private String cloudName;

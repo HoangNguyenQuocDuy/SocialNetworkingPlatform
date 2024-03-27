@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -16,7 +17,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Post {
+public class Post implements Comparable<Post> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID postId;
@@ -56,6 +57,22 @@ public class Post {
     public Set<Comment> setComments(Comment comment) {
         comments.add(comment);
         return comments;
+    }
+
+    @Override
+    public int compareTo(Post otherPost) {
+        Date updatedAt1 = this.getUpdatedAt();
+        Date updatedAt2 = otherPost.getUpdatedAt();
+
+        if (updatedAt1 != null && updatedAt2 != null) {
+            return updatedAt2.compareTo(updatedAt1);
+        } else if (updatedAt1 == null && updatedAt2 != null) {
+            return -1;
+        } else if (updatedAt1 != null) {
+            return 1;
+        } else {
+            return otherPost.getCreatedAt().compareTo(this.getCreatedAt());
+        }
     }
 
     public UUID getPostId() {
