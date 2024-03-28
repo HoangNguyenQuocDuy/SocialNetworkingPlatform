@@ -18,6 +18,8 @@ public interface IUserService {
     User getUserByToken(String token);
     Optional<User> findUserByRefreshToken(RefreshToken refreshToken);
     List<UserResponseDto> findUsersByCurrentName(String currentName);
+    void forgotPassword(String userId) throws Exception;
+    void resetPassword(String email, String verificationCode, String newPassword) throws Exception;
 //
 //    List<UserResponseDto> deleteFriend(UUID userId);
 }

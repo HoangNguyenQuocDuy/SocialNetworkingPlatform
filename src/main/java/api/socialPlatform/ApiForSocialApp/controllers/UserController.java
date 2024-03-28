@@ -6,12 +6,11 @@ import api.socialPlatform.ApiForSocialApp.services.IUserService;
 import api.socialPlatform.ApiForSocialApp.services.Impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -70,5 +69,36 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ResponseObject("FAILED", "User not found", "")
         );
+    }
+
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<ResponseObject> forgotPassword(@RequestBody String email) {
+        try {
+            userService.forgotPassword(email);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Get token successfully", "")
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(
+                    new ResponseObject("FAILED", "Forgot password action failed", e.getMessage())
+            );
+        }
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<ResponseObject> resetPassword(@RequestBody Map<String, String> data) {
+        try {
+            String email = data.get("email");
+            String verificationCode = data.get("verificationCode");
+            String newPassword = data.get("newPassword");
+            userService.resetPassword(email, verificationCode, newPassword);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Reset password successfully", "")
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(
+                    new ResponseObject("FAILED", "Reset password action failed", e.getMessage())
+            );
+        }
     }
 }

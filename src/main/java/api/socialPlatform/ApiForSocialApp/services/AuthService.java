@@ -20,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -36,6 +37,8 @@ public class AuthService {
     private UserServiceImpl userService;
     @Autowired
     private RefreshTokenServiceImp refreshTokenServiceImp;
+    @Autowired
+    private ICloudinaryService cloudinaryService;
 
     public ResponseEntity<?> authenticate(AuthRequest request, HttpServletResponse response) {
         try {

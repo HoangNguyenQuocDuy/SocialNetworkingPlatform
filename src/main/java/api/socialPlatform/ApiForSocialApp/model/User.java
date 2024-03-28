@@ -26,6 +26,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String imageUrl;
+    private String resetPasswordCode;
     @ElementCollection
     private Set<UUID> friendIds;
     @ElementCollection
@@ -162,6 +163,14 @@ public class User implements UserDetails {
 
     public void setLikedPosts(Set<Post> likedPosts) {
         this.likedPosts = likedPosts;
+    }
+
+    public String getResetPasswordCode() {
+        return resetPasswordCode;
+    }
+
+    public void setResetPasswordCode(String resetPasswordCode) {
+        this.resetPasswordCode = resetPasswordCode;
     }
 
     @Override

@@ -12,13 +12,12 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,11 +25,14 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements IUserService {
     @Autowired
     private IUserRepo userRepo;
+    @Autowired
+    private JavaMailSender javaMailSender;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Value("${secret.key}")
     private String secretKey;
 
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User saveUser(User user) {
@@ -110,15 +112,46 @@ public class UserServiceImpl implements IUserService {
         return usersResponse;
     }
 
-    private List<UserResponseDto> caseToListUserResponseDto(User user) {
-        List<UserResponseDto> friends = new ArrayList<>();
+    @Override
+    public void forgotPassword(String email) throws Exception {
+        Optional<User> user = userRepo.findByEmail(email);
+        if (!user.isPresent()) {
+            throw new RuntimeException("User with ID " + user.get().getUserId() + " not found!");
+        }
+        String verificationCode = generateVerificationCode();
+        user.get().setResetPasswordCode(verificationCode);
+        userRepo.save(user.get());
 
-        user.getFriendIds().forEach(id -> {
-            User userFriend = userRepo.findByUserId(id).get();
-            UserResponseDto userResponseDto = UserResponseDto.fromUser(userFriend);
-            friends.add(userResponseDto);
-        });
+        sendVerificationCodeByEmail(email, verificationCode);
+    }
 
-        return friends;
+    @Override
+    public void resetPassword(String email, String verificationCode, String newPassword) throws Exception {
+        Optional<User> user = userRepo.findByEmail(email);
+
+        if (!user.isPresent()) {
+            throw new Exception("User with ID " + user.get().getUserId() + " not found!");
+        }
+        if (!user.get().getResetPasswordCode().equals(verificationCode)) {
+            throw new IllegalArgumentException("Invalid verification code");
+        }
+        user.get().setPassword(passwordEncoder.encode(newPassword));
+        user.get().setResetPasswordCode(null);
+        userRepo.save(user.get());
+    }
+
+
+    private String generateVerificationCode() {
+        Random random = new Random();
+        int code = random.nextInt(900000) + 100000;
+        return String.valueOf(code);
+    }
+    public void sendVerificationCodeByEmail(String email, String verificationCode) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("YOUR VERIFICATION CODE FROM SOCIAL APP");
+        message.setText("Your verification code is: " + verificationCode);
+
+        javaMailSender.send(message);
     }
 }
